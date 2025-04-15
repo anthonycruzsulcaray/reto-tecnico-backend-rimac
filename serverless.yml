@@ -55,7 +55,7 @@ provider:
 
 functions:
   api:
-    handler: src/infrastructure/handlers/appointmentHandler.handler
+    handler: src/infrastructure/handler/appointmentHandler.handler
     timeout: 30
     events:
       - http:
@@ -69,14 +69,14 @@ functions:
             Fn::GetAtt: [ConfirmationsQueue, Arn]
 
   appointment_pe:
-    handler: src/infrastructure/handlers/appointmentPEHandler.handler
+    handler: src/infrastructure/handler/appointmentPEHandler.handler
     events:
       - sqs:
           arn:
             Fn::GetAtt: [SQSPEQueue, Arn]
 
   appointment_cl:
-    handler: src/infrastructure/handlers/appointmentCLHandler.handler
+    handler: src/infrastructure/handler/appointmentCLHandler.handler
     events:
       - sqs:
           arn:

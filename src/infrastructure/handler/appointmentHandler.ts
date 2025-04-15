@@ -21,6 +21,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       status: "pending",
     });
 
+    // Verificar el valor de SNS_TOPIC_ARN
+    console.log("SNS_TOPIC_ARN:", snsTopicArn);
+
     // 2. Publicar al SNS
     await sns.publish({
       TopicArn: snsTopicArn,
