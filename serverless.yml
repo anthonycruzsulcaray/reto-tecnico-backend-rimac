@@ -1,0 +1,165 @@
+service: rimac-backend-citas
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-offline
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - 'package.json'
+  individually: true
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-west-1
+  stage: dev
+  memorySize: 250
+
+  environment:
+    DYNAMO_TABLE_NAME: Appointments
+    SNS_TOPIC_ARN:
+      Ref: AppointmentTopic
+    EVENT_BUS_NAME: appointment-confirmations-bus
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:GetItem
+            - dynamodb:Query
+          Resource: 
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMO_TABLE_NAME}
+        - Effect: Allow
+          Action:
+            - sns:Publish
+          Resource: 
+            - arn:aws:sns:${self:provider.region}:*:appointment-topic
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+            - sqs:ReceiveMessage
+            - sqs:DeleteMessage
+          Resource: 
+            - arn:aws:sqs:${self:provider.region}:*:*
+        - Effect: Allow
+          Action:
+            - events:PutEvents
+          Resource:
+            - arn:aws:events:${self:provider.region}:*:event-bus/appointment-confirmations-bus
+
+functions:
+  api:
+    handler: src/infrastructure/handlers/appointmentHandler.handler
+    timeout: 60
+    events:
+      - http:
+          path: appointments
+          method: post
+      - http:
+          path: appointments/{insuredId}
+          method: get
+      - sqs:
+          arn:
+            Fn::GetAtt: [ConfirmationsQueue, Arn]
+
+  appointment_pe:
+    handler: src/infrastructure/handlers/appointmentPEHandler.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [SQSPEQueue, Arn]
+
+  appointment_cl:
+    handler: src/infrastructure/handlers/appointmentCLHandler.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [SQSCLQueue, Arn]
+
+resources:
+  Resources:
+    # DynamoDB Table
+    AppointmentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.DYNAMO_TABLE_NAME}
+        AttributeDefinitions:
+          - AttributeName: insuredId
+            AttributeType: S
+          - AttributeName: scheduleId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: insuredId
+            KeyType: HASH
+          - AttributeName: scheduleId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+
+    # SNS Topic
+    AppointmentTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: appointment-topic
+
+    # SQS PE
+    SQSPEQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: SQS_PE
+
+    # SQS CL
+    SQSCLQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: SQS_CL
+
+    AppointmentTopicSubscriptionPE:
+      Type: AWS::SNS::Subscription
+      Properties:
+        TopicArn: 
+          Ref: AppointmentTopic
+        Protocol: sqs
+        Endpoint:
+          Fn::GetAtt: [SQSPEQueue, Arn]
+        FilterPolicy:
+          countryISO: ["PE"]
+
+    AppointmentTopicSubscriptionCL:
+      Type: AWS::SNS::Subscription
+      Properties:
+        TopicArn: 
+          Ref: AppointmentTopic
+        Protocol: sqs
+        Endpoint:
+          Fn::GetAtt: [SQSCLQueue, Arn]
+        FilterPolicy:
+          countryISO: ["CL"]
+
+    AppointmentConfirmationBus:
+      Type: AWS::Events::EventBus
+      Properties:
+        Name: appointment-confirmations-bus
+
+    ConfirmationsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: SQS_CONFIRMATIONS
+
+    AppointmentConfirmationRule:
+      Type: AWS::Events::Rule
+      Properties:
+        EventBusName: appointment-confirmations-bus
+        EventPattern:
+          source:
+            - "appointment.confirmation"
+        Targets:
+          - Arn:
+              Fn::GetAtt: [ConfirmationsQueue, Arn]
+            Id: "ConfirmationsQueueTarget"
+
