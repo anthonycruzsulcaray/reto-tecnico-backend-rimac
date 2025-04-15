@@ -1,8 +1,8 @@
 import { SQSEvent } from "aws-lambda";
-import { RDSAppointmentRepository } from "../repository/rds.repository";
+import { RdsMysqlAppointmentRepository } from "../repository/rds.repository";
 import { EventBridge } from "aws-sdk";
 
-const repository = new RDSAppointmentRepository();
+const repository = new RdsMysqlAppointmentRepository();
 const eventBridge = new EventBridge();
 
 export const handler = async (event: SQSEvent) => {

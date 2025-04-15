@@ -1,7 +1,7 @@
 import { Appointment } from "../../domain/entities/appointment";
 import mysql from "mysql2/promise";
 
-export class RDSAppointmentRepository {
+export class RdsMysqlAppointmentRepository {
   private pool = mysql.createPool({
     host: process.env.RDS_HOST,
     port: parseInt(process.env.RDS_PORT || "3306"),
