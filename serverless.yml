@@ -9,6 +9,7 @@ package:
   patterns:
     - '!node_modules/**'
     - 'package.json'
+    - '.build/**'
   individually: true
 
 provider:
