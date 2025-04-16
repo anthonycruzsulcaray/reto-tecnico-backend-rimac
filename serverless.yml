@@ -4,13 +4,7 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-offline
-
-package:
-  patterns:
-    - '!node_modules/**'
-    - 'package.json'
-    - '.build/**'
-  individually: true
+  - serverless-plugin-typescript
 
 provider:
   name: aws
