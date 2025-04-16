@@ -6,7 +6,7 @@ import { SNS } from "aws-sdk";
 const repository = new DynamoAppointmentRepository();
 const service = new AppointmentService(repository);
 const sns = new SNS();
-console.log("env : ",process.env);
+// console.log("env : ",process.env);
 const snsTopicArn = process.env.SNS_TOPIC_ARN!;
 
 export const handler: APIGatewayProxyHandler = async (event) => {
