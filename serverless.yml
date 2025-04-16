@@ -20,8 +20,7 @@ provider:
 
   environment:
     DYNAMO_TABLE_NAME: Appointments
-    SNS_TOPIC_ARN:
-      Ref: AppointmentTopic
+    SNS_TOPIC_ARN: arn:aws:sns:us-west-1:011528258636:appointment-topic
     EVENT_BUS_NAME: appointment-confirmations-bus
 
   iam:
