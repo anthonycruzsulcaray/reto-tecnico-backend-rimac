@@ -1,0 +1,93 @@
+openapi: "3.0.1"
+info:
+  title: "Reto tecnico de citas - Rimac"
+  description: "Postulacion Anthony Cruz"
+  version: "1.0.0"
+servers:
+- url: "https://2bs4tp9a5h.execute-api.us-west-1.amazonaws.com/{basePath}"
+  variables:
+    basePath:
+      default: "dev"
+
+paths:
+  /appointments:
+    post:
+      summary: Crear una nueva cita médica
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createAppointment'
+      responses:
+        201:
+          description: Cita creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+
+  /appointments/{insuredId}:
+    get:
+      summary: Obtener citas médicas por ID de asegurado
+      parameters:
+        - name: insuredId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Lista de citas médicas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/appointment'
+
+components:
+  schemas:
+    createAppointment:
+      type: object
+      required:
+        - insuredId
+        - scheduleId
+        - countryISO
+      properties:
+        insuredId:
+          type: string
+          example: "00001"
+        scheduleId:
+          type: integer
+          example: 1
+        countryISO:
+          type: string
+          enum:
+            - PE
+            - CL
+          example: "PE"
+    appointment:
+      type: object
+      properties:
+        insuredId:
+          type: string
+          example: "00001"
+        scheduleId:
+          type: integer
+          example: 1
+        countryISO:
+          type: string
+          example: "PE"
+        status:
+          type: string
+          enum:
+            - pending
+            - completed
+          example: "pending"
+
+
