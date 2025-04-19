@@ -1,9 +1,9 @@
 import { SQSEvent } from "aws-lambda";
 import { RdsMysqlAppointmentRepository } from "../repository/rds.repository";
-import { EventBridge } from "aws-sdk";
+import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge"; 
 
 const repository = new RdsMysqlAppointmentRepository();
-const eventBridge = new EventBridge();
+const eventBridgeClient = new EventBridgeClient({ region: process.env.AWS_REGION }); 
 
 export const handler = async (event: SQSEvent) => {
   for (const record of event.Records) {
@@ -18,7 +18,7 @@ export const handler = async (event: SQSEvent) => {
     });
 
     // Enviar evento de confirmación a EventBridge
-    await eventBridge.putEvents({
+    const putEventsCommand = new PutEventsCommand({
       Entries: [
         {
           EventBusName: process.env.EVENT_BUS_NAME!,
@@ -30,7 +30,9 @@ export const handler = async (event: SQSEvent) => {
           }),
         },
       ],
-    }).promise();
+    });
+
+    await eventBridgeClient.send(putEventsCommand); 
   }
 
   return {

@@ -15,9 +15,14 @@ provider:
 
   environment:
     DYNAMO_TABLE_NAME: Appointments
-    SNS_TOPIC_ARN: arn:aws:sns:us-west-1:011528258636:appointment-topic
+    SNS_TOPIC_ARN:
+      Ref: AppointmentTopic
     EVENT_BUS_NAME: appointment-confirmations-bus
-
+    RDS_HOST: reto-rimac-appointments-db.ctg808oie5xy.us-west-1.rds.amazonaws.com
+    RDS_USER: admin
+    RDS_PASSWORD: tazmaniazxc12345
+    RDS_DATABASE: appointments_db
+    
   iam:
     role:
       statements:

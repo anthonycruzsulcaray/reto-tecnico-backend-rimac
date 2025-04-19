@@ -1,11 +1,11 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import { DynamoAppointmentRepository } from "../repository/dynamo.repository";
 import { AppointmentService } from "../../application/service/appointment.service";
-import { SNS } from "aws-sdk";
+import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 
 const repository = new DynamoAppointmentRepository();
 const service = new AppointmentService(repository);
-const sns = new SNS();
+const snsClient = new SNSClient({ region: process.env.AWS_REGION });
 // console.log("env : ",process.env);
 const snsTopicArn = process.env.SNS_TOPIC_ARN!;
 
@@ -25,7 +25,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     console.log("SNS_TOPIC_ARN:", snsTopicArn);
 
     // 2. Publicar al SNS
-    await sns.publish({
+    const publishCommand = new PublishCommand({
       TopicArn: snsTopicArn,
       Message: JSON.stringify({
         insuredId: body.insuredId,
@@ -35,10 +35,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       MessageAttributes: {
         countryISO: {
           DataType: "String",
-          StringValue: body.countryISO
-        }
-      }
-    }).promise();
+          StringValue: body.countryISO,
+        },
+      },
+    });
+    await snsClient.send(publishCommand);
 
     return {
       statusCode: 201,
