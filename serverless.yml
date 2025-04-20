@@ -44,8 +44,10 @@ provider:
             - sqs:SendMessage
             - sqs:ReceiveMessage
             - sqs:DeleteMessage
-          Resource: 
-            - arn:aws:sqs:${self:provider.region}:*:*
+          Resource:
+            - Fn::GetAtt: [SQSPEQueue, Arn]
+            - Fn::GetAtt: [SQSCLQueue, Arn]
+            - Fn::GetAtt: [ConfirmationsQueue, Arn]
         - Effect: Allow
           Action:
             - events:PutEvents

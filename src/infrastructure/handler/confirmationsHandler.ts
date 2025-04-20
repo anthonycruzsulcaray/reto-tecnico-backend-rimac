@@ -12,7 +12,7 @@ export const handler = async (event: SQSEvent) => {
       const sqsMessage = JSON.parse(record.body);
 
       // El contenido real del evento está en el campo "Detail"
-      const body = sqsMessage.detail;
+      const body = JSON.parse(sqsMessage.detail);
 
       console.log("Processing record:", body);
 
@@ -26,6 +26,7 @@ export const handler = async (event: SQSEvent) => {
 
       // Actualizar el estado de la cita en DynamoDB
       await service.completeAppointment(insuredId, scheduleId);
+      console.log(`Appointment updated to completed: InsuredId=${insuredId}, ScheduleId=${scheduleId}`);
     } catch (error) {
       console.error("Error procesando el mensaje de SQS:", record, error);
     }
