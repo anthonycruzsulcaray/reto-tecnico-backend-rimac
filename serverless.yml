@@ -111,12 +111,51 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: SQS_PE
-
+      
     # SQS CL
     SQSCLQueue:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: SQS_CL
+    
+    SQSPEQueuePolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        Queues:
+          - Ref: SQSPEQueue
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: sns.amazonaws.com
+              Action: "sqs:SendMessage"
+              Resource:
+                Fn::GetAtt: [SQSPEQueue, Arn]
+              Condition:
+                ArnEquals:
+                  aws:SourceArn:
+                    Ref: AppointmentTopic
+
+    # SQS CL
+    SQSCLQueuePolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        Queues:
+          - Ref: SQSCLQueue
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: sns.amazonaws.com
+              Action: "sqs:SendMessage"
+              Resource:
+                Fn::GetAtt: [SQSCLQueue, Arn]
+              Condition:
+                ArnEquals:
+                  aws:SourceArn:
+                    Ref: AppointmentTopic
 
     AppointmentTopicSubscriptionPE:
       Type: AWS::SNS::Subscription

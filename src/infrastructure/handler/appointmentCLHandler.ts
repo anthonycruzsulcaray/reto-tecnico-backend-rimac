@@ -1,14 +1,17 @@
 import { SQSEvent } from "aws-lambda";
 import { RdsMysqlAppointmentRepository } from "../repository/rds.repository";
-import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge"; 
+import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge";
 
 const repository = new RdsMysqlAppointmentRepository();
-const eventBridgeClient = new EventBridgeClient({ region: process.env.AWS_REGION }); 
+const eventBridgeClient = new EventBridgeClient({ region: process.env.AWS_REGION });
 
 export const handler = async (event: SQSEvent) => {
   for (const record of event.Records) {
-    const body = JSON.parse(record.body);
-    console.log("Processing record:", record.body);
+    // Deserializar el mensaje SNS envuelto en SQS
+    const snsMessage = JSON.parse(record.body);
+    const body = JSON.parse(snsMessage.Message);
+
+    console.log("Processing record:", body);
 
     // Guardar la cita en la base de datos
     await repository.saveAppointment({
@@ -28,12 +31,15 @@ export const handler = async (event: SQSEvent) => {
           Detail: JSON.stringify({
             insuredId: body.insuredId,
             scheduleId: body.scheduleId,
+            countryISO: body.countryISO,
+            status: "completed", // Estado que será actualizado en DynamoDB
           }),
         },
       ],
     });
 
     await eventBridgeClient.send(putEventsCommand);
+    console.log("Event sent to EventBridge:", putEventsCommand);
   }
 
   return {
