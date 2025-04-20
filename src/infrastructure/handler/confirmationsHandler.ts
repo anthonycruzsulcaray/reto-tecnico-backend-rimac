@@ -9,6 +9,7 @@ export const handler = async (event: SQSEvent) => {
   for (const record of event.Records) {
     try {
       const body = JSON.parse(record.body);
+      console.log("Processing record:", record.body);
     
       const insuredId = body.detail.insuredId;
       const scheduleId = body.detail.scheduleId;

@@ -8,6 +8,7 @@ const eventBridgeClient = new EventBridgeClient({ region: process.env.AWS_REGION
 export const handler = async (event: SQSEvent) => {
   for (const record of event.Records) {
     const body = JSON.parse(record.body);
+    console.log("Processing record:", record.body);
 
     // Guardar en RDS (simulación de insert real)
     await repository.saveAppointment({
