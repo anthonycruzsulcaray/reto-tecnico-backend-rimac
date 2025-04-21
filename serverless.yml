@@ -56,42 +56,6 @@ provider:
           Resource:
             - arn:aws:events:${self:provider.region}:*:event-bus/appointment-confirmations-bus
 
-functions:
-  api:
-    handler: src/infrastructure/handler/appointmentHandler.handler
-    timeout: 30
-    events:
-      - http:
-          path: appointments
-          method: post
-      - http:
-          path: appointments/{insuredId}
-          method: get
-      #- sqs:
-      #    arn:
-      #      Fn::GetAtt: [ConfirmationsQueue, Arn]
-
-  confirmationsHandler:
-    handler: src/infrastructure/handler/confirmationsHandler.handler
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt: [ConfirmationsQueue, Arn]
-
-  appointment_pe:
-    handler: src/infrastructure/handler/appointmentPEHandler.handler
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt: [SQSPEQueue, Arn]
-
-  appointment_cl:
-    handler: src/infrastructure/handler/appointmentCLHandler.handler
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt: [SQSCLQueue, Arn]
-
 resources:
   Resources:
     # DynamoDB Table
@@ -128,7 +92,8 @@ resources:
       Type: AWS::SQS::Queue
       Properties:
         QueueName: SQS_CL
-    
+        
+    # SQS Policy for PE Queue
     SQSPEQueuePolicy:
       Type: AWS::SQS::QueuePolicy
       Properties:
@@ -148,7 +113,7 @@ resources:
                   aws:SourceArn:
                     Ref: AppointmentTopic
 
-    # SQS CL
+    # SQS Policy for CL Queue
     SQSCLQueuePolicy:
       Type: AWS::SQS::QueuePolicy
       Properties:
@@ -200,6 +165,7 @@ resources:
       Properties:
         QueueName: SQS_CONFIRMATIONS
 
+    # EventBridge Rule for Appointment Confirmation
     AppointmentConfirmationRule:
       Type: AWS::Events::Rule
       Properties:
@@ -207,8 +173,45 @@ resources:
         EventPattern:
           source:
             - "appointment.confirmation"
+          detail-type:
+            - "AppointmentConfirmed"
         Targets:
           - Arn:
               Fn::GetAtt: [ConfirmationsQueue, Arn]
             Id: "ConfirmationsQueueTarget"
 
+functions:
+  api:
+    handler: src/infrastructure/handler/appointmentHandler.handler
+    timeout: 30
+    events:
+      - http:
+          path: appointments
+          method: post
+      - http:
+          path: appointments/{insuredId}
+          method: get
+
+  confirmationsHandler:
+    handler: src/infrastructure/handler/confirmationsHandler.handler
+    timeout: 30
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [ConfirmationsQueue, Arn]
+
+  appointment_pe:
+    handler: src/infrastructure/handler/appointmentPEHandler.handler
+    timeout: 30
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [SQSPEQueue, Arn]
+
+  appointment_cl:
+    handler: src/infrastructure/handler/appointmentCLHandler.handler
+    timeout: 30
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt: [SQSCLQueue, Arn]

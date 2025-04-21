@@ -13,7 +13,7 @@ export const handler = async (event: SQSEvent) => {
 
     console.log("Processing record:", body);
 
-    // Guardar en RDS (simulación de insert real)
+    // Guardar en RDS
     await repository.saveAppointment({
       insuredId: body.insuredId,
       scheduleId: body.scheduleId,

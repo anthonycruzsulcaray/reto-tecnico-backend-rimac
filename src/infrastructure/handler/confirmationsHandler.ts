@@ -10,10 +10,10 @@ export const handler = async (event: SQSEvent) => {
     try {
       // Deserializar el mensaje recibido desde SQS
       const sqsMessage = JSON.parse(record.body);
+      console.log("Processing sqsMessage:", sqsMessage);
 
       // El contenido real del evento está en el campo "Detail"
       const body = JSON.parse(sqsMessage.detail);
-
       console.log("Processing record:", body);
 
       const insuredId = body.insuredId;
