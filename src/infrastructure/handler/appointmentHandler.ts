@@ -43,14 +43,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     return {
       statusCode: 201,
-      body: JSON.stringify({ message: "Appointment created and published to SNS successfully" }),
+      body: JSON.stringify({ message: "Cita creada y publicada en SNS exitosamente" }),
     };
   }
 
   if (event.httpMethod === "GET") {
     const insuredId = event.pathParameters?.insuredId;
     if (!insuredId) {
-      return { statusCode: 400, body: "Missing insuredId" };
+      return { statusCode: 400, body: "No se obtuvo el key:  insuredId" };
     }
     const appointments = await service.getAppointments(insuredId);
     return {
@@ -59,5 +59,5 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     };
   }
 
-  return { statusCode: 405, body: "Method Not Allowed" };
+  return { statusCode: 405, body: "Metodo no permitido" };
 };

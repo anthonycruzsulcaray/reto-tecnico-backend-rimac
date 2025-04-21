@@ -13,7 +13,7 @@ export class DynamoAppointmentRepository implements AppointmentRepository {
       TableName: tableName,
       Item: appointment,
     });
-    await dynamoDb.send(command); // Ejecutar el comando
+    await dynamoDb.send(command);
   }
 
   async getAppointmentsByInsuredId(insuredId: string): Promise<Appointment[]> {
@@ -24,7 +24,7 @@ export class DynamoAppointmentRepository implements AppointmentRepository {
         ":insuredId": insuredId,
       },
     });
-    const result = await dynamoDb.send(command); // Ejecutar el comando
+    const result = await dynamoDb.send(command);
     return result.Items as Appointment[];
   }
 
@@ -36,6 +36,6 @@ export class DynamoAppointmentRepository implements AppointmentRepository {
       ExpressionAttributeNames: { "#status": "status" },
       ExpressionAttributeValues: { ":status": status },
     });
-    await dynamoDb.send(command); // Ejecutar el comando
+    await dynamoDb.send(command);
   }
 }

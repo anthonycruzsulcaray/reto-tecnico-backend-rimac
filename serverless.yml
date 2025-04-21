@@ -67,6 +67,13 @@ functions:
       - http:
           path: appointments/{insuredId}
           method: get
+      #- sqs:
+      #    arn:
+      #      Fn::GetAtt: [ConfirmationsQueue, Arn]
+
+  confirmationsHandler:
+    handler: src/infrastructure/handler/confirmationsHandler.handler
+    events:
       - sqs:
           arn:
             Fn::GetAtt: [ConfirmationsQueue, Arn]
