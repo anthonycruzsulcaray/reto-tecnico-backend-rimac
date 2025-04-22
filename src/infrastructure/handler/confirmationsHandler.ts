@@ -6,6 +6,7 @@ const repository = new DynamoAppointmentRepository();
 const service = new AppointmentService(repository);
 
 export const handler = async (event: SQSEvent) => {
+  console.log("Event received:", JSON.stringify(event, null, 2));
   for (const record of event.Records) {
     try {
       // Deserializar el mensaje recibido desde SQS

@@ -33,9 +33,9 @@ export const handler = async (event: SQSEvent) => {
             scheduleId: body.scheduleId,
             countryISO: body.countryISO,
             status: "completed", // Estado que será actualizado en DynamoDB
-          }),
-        },
-      ],
+          })
+        }
+      ]
     });
 
     await eventBridgeClient.send(putEventsCommand);

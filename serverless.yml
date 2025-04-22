@@ -165,6 +165,26 @@ resources:
       Properties:
         QueueName: SQS_CONFIRMATIONS
 
+    # SQS Policy for Confirmations Queue
+    ConfirmationsQueuePolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        Queues:
+          - Ref: ConfirmationsQueue
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: events.amazonaws.com
+              Action: "sqs:SendMessage"
+              Resource:
+                Fn::GetAtt: [ConfirmationsQueue, Arn]
+              Condition:
+                ArnEquals:
+                  aws:SourceArn:
+                    Fn::Sub: "arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/appointment-confirmations-bus"
+
     # EventBridge Rule for Appointment Confirmation
     AppointmentConfirmationRule:
       Type: AWS::Events::Rule
@@ -191,6 +211,9 @@ functions:
       - http:
           path: appointments/{insuredId}
           method: get
+      #- sqs:
+      #    arn:
+      #      Fn::GetAtt: [ConfirmationsQueue, Arn]
 
   confirmationsHandler:
     handler: src/infrastructure/handler/confirmationsHandler.handler

@@ -1,9 +1,9 @@
 import { SQSEvent } from "aws-lambda";
 import { RdsMysqlAppointmentRepository } from "../repository/rds.repository";
-import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge"; 
+import { EventBridgeClient, PutEventsCommand } from "@aws-sdk/client-eventbridge";
 
 const repository = new RdsMysqlAppointmentRepository();
-const eventBridgeClient = new EventBridgeClient({ region: process.env.AWS_REGION }); 
+const eventBridgeClient = new EventBridgeClient({ region: process.env.AWS_REGION });
 
 export const handler = async (event: SQSEvent) => {
   for (const record of event.Records) {
@@ -33,14 +33,12 @@ export const handler = async (event: SQSEvent) => {
             scheduleId: body.scheduleId,
             countryISO: body.countryISO,
             status: "completed", // Estado que será actualizado en DynamoDB
-          }),
-        },
-      ],
+          })
+        }
+      ]
     });
 
     await eventBridgeClient.send(putEventsCommand);
-
-    // Log detallado del evento enviado
     console.log("Event sent to EventBridge:", JSON.stringify(putEventsCommand.input, null, 2));
   }
 
