@@ -9,6 +9,7 @@ const tableName = process.env.DYNAMO_TABLE_NAME!;
 
 export class DynamoAppointmentRepository implements AppointmentRepository {
   async createAppointment(appointment: Appointment): Promise<void> {
+    console.log("Creating appointment in DynamoDB:", JSON.stringify(appointment, null, 2));
     const command = new PutCommand({
       TableName: tableName,
       Item: appointment,
@@ -29,6 +30,7 @@ export class DynamoAppointmentRepository implements AppointmentRepository {
   }
 
   async updateAppointmentStatus(insuredId: string, scheduleId: number, status: string): Promise<void> {
+    console.log("Updating appointment status in DynamoDB:",status, insuredId, scheduleId); ;
     const command = new UpdateCommand({
       TableName: tableName,
       Key: { insuredId, scheduleId },

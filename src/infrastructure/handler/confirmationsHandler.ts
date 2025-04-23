@@ -14,7 +14,7 @@ export const handler = async (event: SQSEvent) => {
       console.log("Processing sqsMessage:", sqsMessage);
 
       // El contenido real del evento está en el campo "Detail"
-      const body = JSON.parse(sqsMessage.detail);
+      const body = sqsMessage.detail;
       console.log("Processing record:", body);
 
       const insuredId = body.insuredId;
