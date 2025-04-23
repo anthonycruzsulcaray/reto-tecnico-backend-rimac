@@ -155,11 +155,12 @@ resources:
         FilterPolicy:
           countryISO: ["CL"]
 
+    # Event Bus
     AppointmentConfirmationBus:
       Type: AWS::Events::EventBus
       Properties:
         Name: appointment-confirmations-bus
-
+    # SQS ConfirmationsQueue
     ConfirmationsQueue:
       Type: AWS::SQS::Queue
       Properties:
@@ -180,10 +181,10 @@ resources:
               Action: "sqs:SendMessage"
               Resource:
                 Fn::GetAtt: [ConfirmationsQueue, Arn]
-              Condition:
-                ArnEquals:
-                  aws:SourceArn:
-                    Fn::Sub: "arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/appointment-confirmations-bus"
+              #Condition:
+              #  ArnEquals:
+              #    aws:SourceArn:
+              #      Fn::Sub: "arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/appointment-confirmations-bus"
 
     # EventBridge Rule for Appointment Confirmation
     AppointmentConfirmationRule:

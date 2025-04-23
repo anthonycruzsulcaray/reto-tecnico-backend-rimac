@@ -38,7 +38,8 @@ export const handler = async (event: SQSEvent) => {
       ]
     });
 
-    await eventBridgeClient.send(putEventsCommand);
+    let putEvent= await eventBridgeClient.send(putEventsCommand);
+    console.log("putEvent:", JSON.stringify(putEvent, null, 2));
     console.log("Event sent to EventBridge:", JSON.stringify(putEventsCommand.input, null, 2));
   }
 
