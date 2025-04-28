@@ -27,7 +27,7 @@
 [Nest](https://github.com/nestjs/nest) Repositorio de inicio del framework TypeScript.
 
 
-# Reto Técnico Rimac Backend 2024
+# Reto Técnico Rimac Backend 2025
 
 ## 🩺 Aplicación de agendamiento de cita médica para asegurados
 
@@ -89,7 +89,7 @@ El flujo general de la aplicación es:
 - **Request Body:**
 ```json
 {
-  "insuredId": "00012",
+  "insuredId": "00001",
   "scheduleId": 100,
   "countryISO": "PE"
 }
@@ -109,13 +109,13 @@ El flujo general de la aplicación es:
 **GET** `/appointments/{insuredId}`
 
 - **Path Parameter:**
-  - `insuredId`: ID del asegurado (ejemplo: `00012`)
+  - `insuredId`: ID del asegurado (ejemplo: `00001`)
 
 - **Response:**
 ```json
 [
   {
-    "insuredId": "00012",
+    "insuredId": "00001",
     "scheduleId": 100,
     "countryISO": "PE",
     "status": "pending"
