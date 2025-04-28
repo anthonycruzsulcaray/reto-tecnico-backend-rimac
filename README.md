@@ -218,7 +218,7 @@ La documentación incluye:
 
 ## 📦 Tecnologías utilizadas
 
-- Node.js 18.x
+- Node.js 20.x
 - TypeScript
 - AWS Lambda
 - API Gateway
